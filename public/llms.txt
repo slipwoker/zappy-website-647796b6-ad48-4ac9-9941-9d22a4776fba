@@ -1,0 +1,79 @@
+# Business — Generative Engine Optimization Map
+
+---
+
+## Pages
+
+### Home
+https://example.com
+Dive into Hello Kitty Island Adventure, the Sanrio-themed island life game bursting with charm! Play across Xbox, Apple Arcade, Android &amp; Samsung with full cross-play. Join now!
+
+### Platforms & Cross-Play
+https://example.com/platforms-cross-play
+Connect with friends across Xbox, Apple Arcade, Android, and Samsung Galaxy using Hello Kitty Island Adventure&#39;s seamless cross-play. Find your device on google play console and start exploring!
+
+### About the Adventure
+https://example.com/about
+Discover the heartwarming story behind Hello Kitty Island Adventure — a Sanrio universe brought to life with color, creativity, and cross-platform joy for players of every age. Explore the vision!
+
+### Contact
+https://example.com/contact
+Reach out to the Hello Kitty Island Adventure team for support, partnerships, or platform inquiries including google play console and google services. We&#39;re here and ready to help you play!
+
+### Products
+https://example.com/products
+Our Products - Hello Kitty Island Adventure
+
+### Cart
+https://example.com/cart
+Your Cart
+
+### Checkout
+https://example.com/checkout
+Checkout
+
+### Login
+https://example.com/login
+Customer Login
+
+### Account
+https://example.com/account
+My Account
+
+### Order Success
+https://example.com/order-success
+Thank you for your order
+
+### Product Detail
+https://example.com/product/:slug
+Product Details - Hello Kitty Island Adventure
+
+### Category
+https://example.com/category/:slug
+Products - Hello Kitty Island Adventure
+
+## Legal & Policy
+
+### Privacy Policy
+https://example.com/privacy
+Information about how user data is collected, stored, and protected.
+
+### Terms & Conditions
+https://example.com/terms
+Legal terms describing service usage, rights, and policies.
+
+### Accessibility Statement
+https://example.com/accessibility
+Information about WCAG compliance and accessibility features.
+
+---
+
+# Business Context (for LLM understanding)
+
+## About Business
+---
+
+# Additional Resources
+
+- **Sitemap**: https://example.com/sitemap.xml
+- **Robots.txt**: https://example.com/robots.txt

@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <title>Play Together, Anywhere You Are — Hello Kitty Island Adventure</title>
+    <meta name="description" content="Connect with friends across Xbox, Apple Arcade, Android, and Samsung Galaxy using Hello Kitty Island Adventure&#39;s seamless cross-play. Find your device on google play console and start exploring!">
+    <meta name="keywords" content="Hello Kitty Island Adventure cross-play, google play console, Xbox Apple Arcade Android gaming, Samsung Galaxy Store game, find my device google">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon-512x512.png">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+    <!-- Zappy Analytics -->
+<script>
+(function() {
+  'use strict';
+  
+  // Configuration
+  var config = {
+    websiteId: '647796b6-ad48-4ac9-9941-9d22a4776fba',
+    apiUrl: 'https://api.zappy5.com/api/analytics/track',
+    sessionDuration: 30 * 60 * 1000, // 30 minutes
+    visitorDuration: 30 * 24 * 60 * 60 * 1000, // 30 days
+    trackPageViews: true,
+    trackClicks: true,
+    trackFormSubmissions: true
+  };
+  
+  // Generate or retrieve persistent visitor ID (30 days)
+  function getVisitorId() {
+    var visitorKey = 'zappy_visitor_' + config.websiteId;
+    var visitor = null;
+    
+    try {
+      visitor = localStorage.getItem(visitorKey);
+      if (visitor) {
+        var visitorData = JSON.parse(visitor);
+        var now = Date.now();
+        
+        // Check if visitor ID is still valid (30 days)
+        if (now - visitorData.created < config.visitorDuration) {
+          // Update last seen timestamp
+          visitorData.lastSeen = now;
+          localStorage.setItem(visitorKey, JSON.stringify(visitorData));
+          return visitorData.id;
+        }
+      }
+    } catch (e) {
+      console.warn('Zappy Analytics: LocalStorage not available');
+    }
+    
+    // Generate new visitor ID
+    var newVisitorId = 'zv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    
+    try {
+      localStorage.setItem(visitorKey, JSON.stringify({
+        id: newVisitorId,
+        created: Date.now(),
+        lastSeen: Date.now()
+      }));
+    } catch (e) {
+      // Continue without local storage
+    }
+    
+    return newVisitorId;
+  }
+  
+  // Generate or retrieve session ID (30 minutes)
+  function getSessionId() {
+    var sessionKey = 'zappy_session_' + config.websiteId;
+    var session = null;
+    
+    try {
+      session = sessionStorage.getItem(sessionKey);
+      if (session) {
+        var sessionData = JSON.parse(session);
+        var now = Date.now();
+        
+        // Check if session is still valid
+        if (now - sessionData.timestamp < config.sessionDuration) {
+          // Update timestamp
+          sessionData.timestamp = now;
+          sessionStorage.setItem(sessionKey, JSON.stringify(sessionData));
+          return sessionData.id;
+        }
+      }
+    } catch (e) {
+      console.warn('Zappy Analytics: SessionStorage not available');
+    }
+    
+    // Generate new session ID
+    var newSessionId = 'zs_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    
+    try {
+      sessionStorage.setItem(sessionKey, JSON.stringify({
+        id: newSessionId,
+        timestamp: Date.now()
+      }));
+    } catch (e) {
+      // Continue without session storage
+    }
+    
+    return newSessionId;
+  }
+  
+  var visitorId = getVisitorId();
+  var sessionId = getSessionId();
+  
+  // Track an event
+  function trackEvent(eventType, data) {
+    data = data || {};
+    
+    var eventData = {
+      website_id: config.websiteId,
+      event_type: eventType,
+      page_path: window.location.pathname,
+      referrer: document.referrer || 'direct',
+      visitor_id: visitorId,
+      session_id: sessionId,
+      metadata: data
+    };
+    
+    // Use sendBeacon if available (better for page unload events)
+    if (navigator.sendBeacon) {
+      var blob = new Blob([JSON.stringify(eventData)], { type: 'application/json' });
+      navigator.sendBeacon(config.apiUrl, blob);
+    } else {
+      // Fallback to fetch
+      fetch(config.apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(eventData),
+        keepalive: true
+      }).catch(function(error) {
+        console.warn('Zappy Analytics: Failed to track event', error);
+      });
+    }
+  }
+  
+  // Track page view
+  if (config.trackPageViews) {
+    trackEvent('pageview', {
+      title: document.title,
+      url: window.location.href
+    });
+  }
+  
+  // Track clicks on important elements
+  if (config.trackClicks) {
+    document.addEventListener('click', function(e) {
+      var target = e.target;
+      
+      // Track button clicks (counted as actions)
+      if (target.tagName === 'BUTTON' || target.closest('button')) {
+        var button = target.tagName === 'BUTTON' ? target : target.closest('button');
+        trackEvent('click', {
+          element: 'button',
+          text: button.textContent.trim().substring(0, 100),
+          id: button.id || null,
+          class: button.className || null
+        });
+      }
+      
+      // Track link clicks (navigation - not counted as actions)
+      else if (target.tagName === 'A' || target.closest('a')) {
+        var link = target.tagName === 'A' ? target : target.closest('a');
+        trackEvent('navigation', {
+          element: 'link',
+          text: link.textContent.trim().substring(0, 100),
+          href: link.href,
+          external: link.hostname !== window.location.hostname
+        });
+      }
+    }, true);
+  }
+  
+  // Track form submissions
+  if (config.trackFormSubmissions) {
+    document.addEventListener('submit', function(e) {
+      var form = e.target;
+      
+      trackEvent('form_submit', {
+        form_id: form.id || null,
+        form_name: form.name || null,
+        form_action: form.action || null,
+        form_method: form.method || 'GET'
+      });
+    }, true);
+  }
+  
+  // Track time on page (send on page unload)
+  var pageLoadTime = Date.now();
+  
+  window.addEventListener('beforeunload', function() {
+    var timeOnPage = Math.floor((Date.now() - pageLoadTime) / 1000); // in seconds
+    
+    trackEvent('page_unload', {
+      time_on_page: timeOnPage,
+      page_path: window.location.pathname
+    });
+  });
+  
+  // Expose tracking function globally for custom events
+  window.zappyAnalytics = {
+    track: trackEvent,
+    getVisitorId: function() { return visitorId; },
+    getSessionId: function() { return sessionId; }
+  };
+  
+})();
+</script>
+<!-- End Zappy Analytics -->
+    <meta property="og:title" content="Play Together, Anywhere You Are — Hello Kitty Island Adventure">
+    <meta property="og:description" content="Connect with friends across Xbox, Apple Arcade, Android, and Samsung Galaxy using Hello Kitty Island Adventure&#39;s seamless cross-play. Find your device on google play console and start exploring!">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Play Together, Anywhere You Are — Hello Kitty Island Adventure">
+    <meta name="twitter:description" content="Connect with friends across Xbox, Apple Arcade, Android, and Samsung Galaxy using Hello Kitty Island Adventure&#39;s seamless cross-play. Find your device on google play console and start exploring!">
+    <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon-512x512.png">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+    <!-- Cookie Consent -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanilla-cookieconsent@3/dist/cookieconsent.css">
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-cookieconsent@3/dist/cookieconsent.umd.js"></script>
+    <!-- Mickidum Accessibility Toolbar -->
+    <script src="https://cdn.jsdelivr.net/gh/mickidum/acc_toolbar/acctoolbar/acctoolbar.min.js"></script>
+    <link rel="stylesheet" href="/styles.css">
+
+    <style id="zappy-dropdown-submenu-styles">
+      /* ========== DESKTOP DROPDOWN SUBMENU STYLES ========== */
+      /* Base styles for dropdown submenus - parent must be positioned */
+      .nav-menu li:has(.sub-menu), nav li:has(.sub-menu), .navbar li:has(.sub-menu), #navMenu li:has(.sub-menu) { position: relative; }
+      /* Submenu base - hidden by default */
+      .nav-menu .sub-menu, nav .sub-menu, .navbar .sub-menu, #navMenu .sub-menu { display: block !important; position: absolute !important; top: 100%; left: 0; min-width: 220px; background: white; border-radius: 8px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); padding: 8px 0; opacity: 0; visibility: hidden; transform: translateY(10px); transition: all 0.3s ease; z-index: 1000; list-style: none; pointer-events: none; }
+      /* CRITICAL: Desktop hover styles to show dropdown */
+      .nav-menu li:hover > .sub-menu, nav li:hover > .sub-menu, .navbar li:hover > .sub-menu, #navMenu li:hover > .sub-menu { opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; pointer-events: auto !important; }
+      /* Submenu item styling */
+      .sub-menu li { list-style: none; margin: 0; padding: 0; }
+      .sub-menu a { display: block !important; padding: 10px 16px !important; color: var(--text-dark, #333) !important; font-weight: 500; text-decoration: none; white-space: nowrap; transition: background-color 0.2s; }
+      .sub-menu .zappy-nav-child > a { padding-left: 28px !important; font-size: 0.9em !important; opacity: 0.85 !important; }
+      [dir="rtl"] .sub-menu .zappy-nav-child > a, html[lang="he"] .sub-menu .zappy-nav-child > a, html[lang="ar"] .sub-menu .zappy-nav-child > a { padding-left: 10px !important; padding-right: 28px !important; }
+      .sub-menu .zappy-nav-parent > a { font-weight: 600 !important; }
+      .sub-menu a:hover { background-color: #f5f5f5; }
+      /* RTL (Hebrew/Arabic) dropdown positioning */
+      [dir="rtl"] .nav-menu .sub-menu, [dir="rtl"] nav .sub-menu, [dir="rtl"] .navbar .sub-menu, html[lang="he"] .nav-menu .sub-menu, html[lang="he"] nav .sub-menu, html[lang="he"] .navbar .sub-menu, html[lang="ar"] .nav-menu .sub-menu, html[lang="ar"] nav .sub-menu, html[lang="ar"] .navbar .sub-menu { left: auto !important; right: 0 !important; }
+      /* Hide empty dropdown menus (exclude catalog sub-menus that use <a> children instead of <li>) */
+      .sub-menu:empty, .sub-menu:not(:has(li:not(.zappy-hidden-menu-item))):not(:has(> a)), .sub-menu:not(:has(li)):not(:has(> a)) { display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
+      /* Desktop: show submenu on Menu Group hover */
+      li:has(.menu-group-title):hover > .sub-menu { opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; pointer-events: auto !important; }
+      /* Menu Group title styling */
+      .nav-menu > li > .menu-group-title, #navMenu > li > .menu-group-title { display: inline-block; padding: 0.5rem 1rem; cursor: default; user-select: none; }
+      
+      /* ========== MOBILE SUBMENU STYLES ========== */
+      @media (max-width: 768px) {
+        .nav-menu .sub-menu, nav .sub-menu, .navbar .sub-menu, #navMenu .sub-menu { position: static !important; transform: none !important; box-shadow: none !important; background: transparent !important; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.3s ease, opacity 0.3s ease; padding: 0 !important; border-radius: 0 !important; }
+        .navbar .sub-menu.mobile-expanded, .nav-menu .sub-menu.mobile-expanded, #navMenu .sub-menu.mobile-expanded { max-height: none !important; overflow-y: visible !important; opacity: 1 !important; visibility: visible !important; padding: 8px 0 8px 16px !important; }
+        [dir="rtl"] .sub-menu.mobile-expanded, html[lang="he"] .sub-menu.mobile-expanded { padding: 8px 16px 8px 0 !important; }
+        /* Disable hover behavior on mobile */
+        .nav-menu li:hover > .sub-menu, nav li:hover > .sub-menu, .navbar li:hover > .sub-menu, #navMenu li:hover > .sub-menu { opacity: 0; visibility: hidden; pointer-events: none; }
+        .nav-menu li > .sub-menu.mobile-expanded, nav li > .sub-menu.mobile-expanded, .navbar li > .sub-menu.mobile-expanded, #navMenu li > .sub-menu.mobile-expanded { opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; }
+        .nav-menu li:has(.sub-menu), nav li:has(.sub-menu), .navbar li:has(.sub-menu), #navMenu li:has(.sub-menu) { display: flex !important; flex-wrap: wrap !important; align-items: center !important; position: relative !important; min-height: 44px !important; }
+        .nav-menu li:has(.sub-menu) > a, nav li:has(.sub-menu) > a, .navbar li:has(.sub-menu) > a, #navMenu li:has(.sub-menu) > a { flex: 1 !important; min-width: 0 !important; }
+        .nav-menu li:has(.sub-menu) > .menu-group-title, nav li:has(.sub-menu) > .menu-group-title, .navbar li:has(.sub-menu) > .menu-group-title, #navMenu li:has(.sub-menu) > .menu-group-title { flex: 1 !important; min-width: 0 !important; padding: 0 !important; line-height: inherit !important; }
+        .nav-menu li:has(.sub-menu) > .sub-menu, nav li:has(.sub-menu) > .sub-menu, .navbar li:has(.sub-menu) > .sub-menu, #navMenu li:has(.sub-menu) > .sub-menu { flex-basis: 100% !important; width: 100% !important; }
+        .nav-menu li:has(.sub-menu) > a [class*="chevron"], .nav-menu li:has(.sub-menu) > a [class*="arrow"], .nav-menu li:has(.sub-menu) > a .fa-chevron-down, .nav-menu li:has(.sub-menu) > a .fa-angle-down, nav li:has(.sub-menu) > a [class*="chevron"], nav li:has(.sub-menu) > a [class*="arrow"], #navMenu li:has(.sub-menu) > a [class*="chevron"], #navMenu li:has(.sub-menu) > a [class*="arrow"] { display: none !important; visibility: hidden !important; }
+        .mobile-submenu-toggle { display: flex !important; align-items: center !important; justify-content: center !important; width: 44px !important; height: auto !important; background: transparent !important; border: none !important; cursor: pointer !important; color: var(--text-dark) !important; position: static !important; flex-shrink: 0 !important; align-self: stretch !important; z-index: 2 !important; padding: 0 !important; margin: 0 !important; }
+        .mobile-submenu-toggle::after { content: '' !important; width: 0 !important; height: 0 !important; border-left: 6px solid transparent !important; border-right: 6px solid transparent !important; border-top: 7px solid currentColor !important; transition: transform 0.3s ease !important; }
+        .mobile-submenu-toggle.expanded::after { transform: rotate(180deg) !important; }
+        .sub-menu a { padding: 10px 0 !important; display: block !important; color: var(--text-dark) !important; white-space: normal !important; }
+        .sub-menu .zappy-nav-child > a { padding-left: 28px !important; font-size: 0.9em !important; opacity: 0.85 !important; }
+        [dir="rtl"] .sub-menu .zappy-nav-child > a, html[lang="he"] .sub-menu .zappy-nav-child > a, html[lang="ar"] .sub-menu .zappy-nav-child > a { padding-left: 0 !important; padding-right: 28px !important; }
+        .sub-menu .zappy-nav-parent > a { font-weight: 600 !important; }
+        .nav-menu.active, #navMenu.active { max-width: 100vw !important; overflow-x: hidden !important; box-sizing: border-box !important; }
+        .navbar .sub-menu li a, nav.navbar .sub-menu li a, .zappy-products-dropdown .sub-menu a { color: var(--text-dark) !important; }
+      }
+      @media (min-width: 769px) { .mobile-submenu-toggle { display: none !important; } }
+    </style>
+
+    <style id="mobile-lang-menu-deployed-css">
+    @media (max-width: 768px) {
+      .lang-switcher,
+      .nav-cta-container .lang-switcher,
+      .nav-container .lang-switcher,
+      .navbar .lang-switcher,
+      .navbar .nav-cta-container .lang-switcher,
+      .nav-icons-left .lang-switcher,
+      .nav-ecommerce-icons .lang-switcher { display: none !important; }
+      .mobile-lang-menu { width: 100%; border-top: 1px solid rgba(128,128,128,0.2); padding: 8px 0 0 0; margin-top: 8px; }
+      .mobile-lang-toggle { display: flex !important; align-items: center; justify-content: space-between; width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; font-size: 15px; color: inherit; font-family: inherit; }
+      .mobile-lang-toggle::after { content: ''; display: inline-block; width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform 0.3s ease; margin-left: 8px; }
+      .mobile-lang-toggle.expanded::after { transform: rotate(-135deg); }
+      .mobile-lang-options { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+      .mobile-lang-options.expanded { max-height: 300px; }
+      .mobile-lang-option { display: flex !important; align-items: center; gap: 10px; padding: 10px 24px; text-decoration: none; color: inherit; font-size: 14px; font-family: inherit; }
+      .mobile-lang-option:hover { background: rgba(128,128,128,0.1); }
+      .mobile-lang-option.active { font-weight: 600; opacity: 0.7; pointer-events: none; }
+      .mobile-lang-option img { width: 20px; height: 20px; border-radius: 50%; }
+    }
+    @media (min-width: 769px) {
+      .mobile-lang-menu { display: none !important; }
+    }
+    </style>
+
+    <style id="zappy-widget-visibility">
+      #mic-access-tool-general-button, .mic-access-tool-general-button,
+      #mic-init-access-tool .mic-access-tool-general-button, #mic-init-access-tool #mic-access-tool-general-button,
+      ._access-icon, #mic-access-tool-box, .mic-access-tool-box,
+      #mic-init-access-tool #mic-access-tool-box, div[id*="mic-access-tool-box"], ._access-menu {
+        display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important;
+      }
+    </style>
+</head>
+<body>
+
+
+    <div class="mobile-search-panel" id="mobile-search-panel">
+      <div class="search-wrapper">
+        <input type="text" id="mobile-search-input" placeholder="Search products..." autocomplete="off">
+        <button class="search-submit" id="mobile-search-submit" title="Search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>
+        </button>
+        <button class="close-search" id="close-mobile-search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+        </button>
+      </div>
+      <div class="search-results" id="mobile-search-results"></div>
+    </div>
+  
+<script>window.ZAPPY_WEBSITE_ID = "647796b6-ad48-4ac9-9941-9d22a4776fba";window.ZAPPY_API_BASE = (window.location.pathname.includes('/preview') ? "https://api.zappy5.com" : "https://api.zappy5.com");</script>
+  <nav class="navbar">
+  <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+    <svg class="hamburger-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+    </svg>
+    <svg class="close-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;">
+      <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+    </svg>
+  </button>
+
+  <button class="phone-header-btn" data-phone="" aria-label="Call">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+    </svg>
+  </button>
+
+  <div class="nav-container">
+    <div class="nav-brand">
+      <a href="/" class="logo-link">
+        <img src="/assets/business-logo.webp" alt="Hello Kitty Island Adventure" class="logo">
+      </a>
+    </div>
+
+    <ul class="nav-menu" id="navMenu">
+
+    <li class="menu-item-has-children zappy-products-dropdown">
+      <a href="/products">
+        Products
+        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 9l6 6 6-6"></path>
+        </svg>
+      </a>
+      <ul class="sub-menu" id="zappy-nav-category-links">
+        <li><a href="/products">All Products</a></li>
+        <!-- Categories will be loaded dynamically -->
+      </ul>
+    </li>
+  <li><a href="/platforms-cross-play">Platforms &amp; Cross-Play</a></li><li><a href="/about">About the Adventure</a></li><li><a href="/contact">Contact</a></li></ul><div class="nav-ecommerce-icons nav-icons-left"><a href="/login" class="login-link nav-login" title="Login"><svg class="login-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></a><a href="#cart" class="cart-link nav-cart" id="cart-drawer-toggle" title="Cart"><svg class="cart-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg><span class="cart-count">0</span></a><div class="nav-search-box">
+    <input type="text" class="nav-search-input" id="nav-search-input" placeholder="Search products..." autocomplete="off">
+    <button class="nav-search-btn" id="nav-search-btn" title="Search">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>
+    </button>
+    <div class="nav-search-results" id="nav-search-results"></div>
+  </div></div><div class="nav-ecommerce-icons nav-icons-right"><button class="nav-search-toggle" id="mobile-search-toggle" title="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg></button></div>
+
+    
+  </div>
+</nav>
+
+    <nav class="zappy-catalog-menu ltr" id="zappy-catalog-menu" dir="ltr" style="display:none">
+      <div class="catalog-menu-container">
+        <a href="/products" class="catalog-menu-item catalog-menu-all">All Products</a>
+        <div class="catalog-menu-categories" id="zappy-category-links">
+          <!-- Categories will be loaded dynamically -->
+        </div>
+      </div>
+    </nav>
+  
+<script>
+
+// Navbar Mobile Menu Toggle and Contrast Fix
+(function() {
+  // Use 'load' event instead of 'DOMContentLoaded' to ensure we run AFTER all other scripts
+  window.addEventListener('load', function() {
+    
+    // FIX MOBILE BUTTON CONTRAST
+    // Detect navbar background color and apply contrasting color to mobile buttons
+    const navbar = document.querySelector('.navbar, nav, header');
+    if (!navbar) {
+      console.log('[Navbar] Navbar element not found');
+      return;
+    }
+    
+    // DECLARE VARIABLES EARLY to avoid Temporal Dead Zone errors
+    // These are used in multiple places below
+    let mobileToggle = document.getElementById('mobileToggle') ||
+                       document.querySelector('.mobile-toggle') ||
+                       document.querySelector('.hamburger') ||
+                       document.querySelector('.hamburger-menu') ||
+                       document.querySelector('.menu-toggle') ||
+                       document.querySelector('.burger-menu') ||
+                       document.querySelector('[aria-label="Menu"]') ||
+                       document.querySelector('[aria-label="תפריט"]');
+    
+    const phoneBtn = document.querySelector('.phone-header-btn');
+    
+    const computedStyle = window.getComputedStyle(navbar);
+    let bgColor = computedStyle.backgroundColor;
+    
+    console.log('[Navbar] Initial navbar background:', bgColor);
+    
+    // Check if background is transparent or rgba with 0 alpha
+    const isTransparent = bgColor === 'transparent' || 
+                         bgColor === 'rgba(0, 0, 0, 0)' ||
+                         (bgColor.startsWith('rgba') && bgColor.includes(', 0)'));
+    
+    if (isTransparent) {
+      // Check for background-image or gradient
+      const bgImage = computedStyle.backgroundImage;
+      if (bgImage && bgImage !== 'none') {
+        console.log('[Navbar] Navbar has background image/gradient, using dark text');
+        bgColor = 'rgb(240, 240, 240)'; // Assume light background
+      } else {
+        // Transparent navbar - check body background
+        const bodyBg = window.getComputedStyle(document.body).backgroundColor;
+        console.log('[Navbar] Navbar transparent, using body background:', bodyBg);
+        bgColor = bodyBg;
+      }
+    }
+    
+    // Calculate luminance to determine if background is light or dark
+    const rgb = bgColor.match(/\d+/g);
+    if (rgb && rgb.length >= 3) {
+      const r = parseInt(rgb[0]);
+      const g = parseInt(rgb[1]);
+      const b = parseInt(rgb[2]);
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      
+      // Mobile button colors are set by Claude's AI-generated CSS (same as .nav-menu a)
+      // No dynamic color overrides needed - colors come from the generated navbar CSS
+      console.log('[Navbar] Mobile button colors preserved from Claude CSS (luminance:', luminance.toFixed(2) + ')');
+      
+      // FIX ICON SIZES - Ensure SVGs are properly sized and visible
+      // INJECT CRITICAL CSS TO OVERRIDE ANY CONFLICTING RULES
+      const criticalCSS = document.createElement('style');
+      criticalCSS.id = 'zappy-mobile-nav-fix';
+      const htmlLang = document.documentElement.lang || 'en';
+      const htmlDir = document.documentElement.dir || 'ltr';
+      // Check both dir attribute AND lang for RTL detection
+      // dir="rtl" is the most reliable indicator
+      const isRTL = htmlDir === 'rtl' || htmlLang === 'he' || htmlLang === 'ar';
+      
+      criticalCSS.textContent = `
+        /* Hide mobile buttons on desktop, show only on mobile */
+        @media (min-width: 769px) {
+          .mobile-toggle,
+          .phone-header-btn {
+            display: none !important;
+          }
+        }
+        
+        /* Show and position mobile buttons correctly on mobile */
+        @media (max-width: 768px) {
+          .mobile-toggle,
+          .phone-header-btn {
+            position: absolute !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            z-index: 1001 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 50% !important;
+            border: none !important;
+            cursor: pointer !important;
+            padding: 6px !important;
+            background: none !important;
+            color: var(--nav-text, var(--text-dark)) !important;
+          }
+          
+          /* LTR positioning (default): hamburger LEFT, phone RIGHT */
+          html:not([dir="rtl"]):not([lang="he"]):not([lang="ar"]) .mobile-toggle,
+          html[dir="ltr"] .mobile-toggle {
+            left: 12px !important;
+            right: auto !important;
+          }
+          html:not([dir="rtl"]):not([lang="he"]):not([lang="ar"]) .phone-header-btn,
+          html[dir="ltr"] .phone-header-btn {
+            right: 12px !important;
+            left: auto !important;
+          }
+          
+          /* RTL positioning: hamburger RIGHT, phone LEFT */
+          html[dir="rtl"] .mobile-toggle,
+          html[lang="he"] .mobile-toggle,
+          html[lang="ar"] .mobile-toggle {
+            right: 12px !important;
+            left: auto !important;
+          }
+          html[dir="rtl"] .phone-header-btn,
+          html[lang="he"] .phone-header-btn,
+          html[lang="ar"] .phone-header-btn {
+            left: 12px !important;
+            right: auto !important;
+          }
+          
+          /* CRITICAL: Ensure nav-container has min-height on mobile */
+          /* All children are positioned absolutely/fixed on mobile, so height:auto collapses to 0 */
+          .nav-container {
+            min-height: 70px !important;
+            position: relative !important;
+          }
+          
+          /* Ensure SVG icons are properly sized and inherit color */
+          .mobile-toggle svg,
+          .phone-header-btn svg {
+            width: 24px !important;
+            height: 24px !important;
+            /* Don't force display - let JavaScript control hamburger/close toggle */
+          }
+          
+          /* Reset nav-cta-container on mobile - remove desktop box-shadow/padding */
+          /* that creates a visible ghost box when CTA button is hidden */
+          .nav-cta-container {
+            box-shadow: none !important;
+            padding: 0 !important;
+          }
+          
+          /* Hide nav-cta-container entirely on mobile when there's no lang-switcher */
+          /* (only the CTA button is inside, and it's hidden on mobile) */
+          .nav-cta-container:not(:has(.lang-switcher)) {
+            display: none !important;
+          }
+          
+          /* CRITICAL: Prevent hero image fade gradient from bleeding over headline text */
+          /* The .image-fade-gradient has bottom: -30px (extends below parent) */
+          /* On mobile stacked layout, this overlaps the h1 text below the image */
+          .hero-image-column {
+            overflow: hidden !important;
+          }
+          .image-fade-gradient {
+            bottom: 0 !important;
+          }
+          
+          /* Hide desktop language switcher on mobile - hamburger menu handles it */
+          /* High specificity to override stored CSS */
+          .lang-switcher,
+          .nav-cta-container .lang-switcher,
+          .nav-container .lang-switcher,
+          .navbar .lang-switcher,
+          .navbar .nav-cta-container .lang-switcher {
+            display: none !important;
+          }
+        }
+      `;
+      
+      // Remove existing fix if present and inject new one
+      const existing = document.getElementById('zappy-mobile-nav-fix');
+      if (existing) existing.remove();
+      document.head.appendChild(criticalCSS);
+      
+      console.log('[Navbar] Critical CSS injected for mobile nav positioning');
+      
+      // ONLY apply inline positioning styles on mobile viewport
+      // On desktop, the CSS handles hiding these buttons with display: none
+      // Inline styles were breaking desktop layout by overriding CSS
+      const isMobileViewport = window.innerWidth <= 768;
+      
+      if (mobileToggle) {
+        // Icon sizing applies to all viewports for consistency
+        const hamburgerIcon = mobileToggle.querySelector('.hamburger-icon');
+        const closeIcon = mobileToggle.querySelector('.close-icon');
+        
+        if (hamburgerIcon) {
+          hamburgerIcon.style.setProperty('width', '24px', 'important');
+          hamburgerIcon.style.setProperty('height', '24px', 'important');
+          hamburgerIcon.style.setProperty('display', 'block', 'important'); // Show hamburger by default
+        }
+        if (closeIcon) {
+          closeIcon.style.setProperty('width', '24px', 'important');
+          closeIcon.style.setProperty('height', '24px', 'important');
+          closeIcon.style.setProperty('display', 'none', 'important'); // Hide close icon by default
+        }
+        
+        // ONLY set positioning inline styles on mobile
+        if (isMobileViewport) {
+          mobileToggle.style.setProperty('position', 'absolute', 'important');
+          mobileToggle.style.setProperty('top', '50%', 'important');
+          mobileToggle.style.setProperty('transform', 'translateY(-50%)', 'important');
+          mobileToggle.style.setProperty('z-index', '1001', 'important');
+          
+          // Clear any inline left/right so CSS can take over based on html[dir]
+          mobileToggle.style.removeProperty('left');
+          mobileToggle.style.removeProperty('right');
+          
+          console.log('[Navbar] Mobile toggle positioning applied (mobile viewport)');
+        } else {
+          // On desktop, clear any positioning styles to let CSS handle it
+          mobileToggle.style.removeProperty('position');
+          mobileToggle.style.removeProperty('top');
+          mobileToggle.style.removeProperty('transform');
+          mobileToggle.style.removeProperty('z-index');
+          mobileToggle.style.removeProperty('left');
+          mobileToggle.style.removeProperty('right');
+          console.log('[Navbar] Desktop viewport - cleared mobile toggle inline positioning');
+        }
+      }
+      
+      if (phoneBtn) {
+        // Icon sizing applies to all viewports
+        const phoneIcon = phoneBtn.querySelector('svg');
+        if (phoneIcon) {
+          phoneIcon.style.width = '24px';
+          phoneIcon.style.height = '24px';
+          phoneIcon.setAttribute('width', '24');
+          phoneIcon.setAttribute('height', '24');
+        }
+        
+        // ONLY set positioning inline styles on mobile
+        if (isMobileViewport) {
+          phoneBtn.style.setProperty('position', 'absolute', 'important');
+          phoneBtn.style.setProperty('top', '50%', 'important');
+          phoneBtn.style.setProperty('transform', 'translateY(-50%)', 'important');
+          phoneBtn.style.setProperty('z-index', '1001', 'important');
+          
+          // Clear any inline left/right so CSS can take over based on html[dir]
+          phoneBtn.style.removeProperty('left');
+          phoneBtn.style.removeProperty('right');
+          
+          console.log('[Navbar] Phone button positioning applied (mobile viewport)');
+        } else {
+          // On desktop, clear any positioning styles to let CSS handle it
+          phoneBtn.style.removeProperty('position');
+          phoneBtn.style.removeProperty('top');
+          phoneBtn.style.removeProperty('transform');
+          phoneBtn.style.removeProperty('z-index');
+          phoneBtn.style.removeProperty('left');
+          phoneBtn.style.removeProperty('right');
+          console.log('[Navbar] Desktop viewport - cleared phone button inline positioning');
+        }
+      }
+    } else {
+      console.log('[Navbar] Could not parse background color:', bgColor);
+    }
+    
+    // MOBILE MENU TOGGLE
+    // Re-query in case DOM changed (mobileToggle already declared at top of function)
+    mobileToggle = document.getElementById('mobileToggle') ||
+                   document.querySelector('.mobile-toggle') ||
+                   document.querySelector('.hamburger') ||
+                   document.querySelector('.hamburger-menu') ||
+                   document.querySelector('.menu-toggle') ||
+                   document.querySelector('.burger-menu') ||
+                   document.querySelector('[aria-label="Menu"]') ||
+                   document.querySelector('[aria-label="תפריט"]');
+    
+    // EXPANDED SEARCH: Find nav menu by ID or class
+    const navMenu = document.getElementById('navMenu') ||
+                  document.querySelector('.nav-menu') ||
+                  document.querySelector('.nav-links') ||
+                  document.querySelector('nav ul:not(.submenu)');
+    
+    if (!mobileToggle || !navMenu) {
+      console.log('[Navbar] Mobile toggle or menu not found:', { toggle: !!mobileToggle, menu: !!navMenu });
+      return;
+    }
+    
+    // Ensure navMenu has ID for CSS targeting
+    if (!navMenu.id) {
+      navMenu.id = 'navMenu';
+    }
+    
+    console.log('[Navbar] Initializing mobile menu...');
+    
+    // Remove any existing event listeners by cloning the button
+    const newToggle = mobileToggle.cloneNode(true);
+    mobileToggle.parentNode.replaceChild(newToggle, mobileToggle);
+    
+    // Toggle menu on button click - use newToggle now
+    newToggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const hamburgerIcon = this.querySelector('.hamburger-icon');
+      const closeIcon = this.querySelector('.close-icon');
+      const isActive = navMenu.classList.contains('active');
+      
+      if (isActive) {
+        // Close menu
+        navMenu.classList.remove('active');
+        if (hamburgerIcon) hamburgerIcon.style.setProperty('display', 'block', 'important');
+        if (closeIcon) closeIcon.style.setProperty('display', 'none', 'important');
+        document.body.style.overflow = '';
+        console.log('[Navbar] Menu closed');
+      } else {
+        // Open menu
+        navMenu.classList.add('active');
+        if (hamburgerIcon) hamburgerIcon.style.setProperty('display', 'none', 'important');
+        if (closeIcon) closeIcon.style.setProperty('display', 'block', 'important');
+        document.body.style.overflow = 'hidden';
+        console.log('[Navbar] Menu opened');
+      }
+    });
+    
+    // Close menu when clicking nav links (but NOT dropdown toggles)
+    const navLinks = navMenu.querySelectorAll('a');
+    navLinks.forEach(function(link) {
+      link.addEventListener('click', function() {
+        // Don't close if it's a dropdown child (unless it's a real navigation link)
+        if (this.getAttribute('href') === '#') return;
+        
+        const hamburgerIcon = newToggle.querySelector('.hamburger-icon');
+        const closeIcon = newToggle.querySelector('.close-icon');
+        
+        navMenu.classList.remove('active');
+        if (hamburgerIcon) hamburgerIcon.style.setProperty('display', 'block', 'important');
+        if (closeIcon) closeIcon.style.setProperty('display', 'none', 'important');
+        document.body.style.overflow = '';
+        console.log('[Navbar] Menu closed (link clicked)');
+      });
+    });
+    
+    // DROPDOWN MENU TOGGLE (for mobile and touch devices)
+    var dropdownToggles = navMenu.querySelectorAll('.dropdown-toggle');
+    dropdownToggles.forEach(function(toggle) {
+      toggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var parent = this.closest('.nav-dropdown');
+        if (!parent) return;
+        
+        // Close other open dropdowns at the same level
+        var siblings = parent.parentNode.querySelectorAll('.nav-dropdown.open');
+        siblings.forEach(function(sib) {
+          if (sib !== parent) sib.classList.remove('open');
+        });
+        
+        parent.classList.toggle('open');
+        console.log('[Navbar] Dropdown toggled:', parent.classList.contains('open') ? 'open' : 'closed');
+      });
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.nav-dropdown')) {
+        var openDropdowns = document.querySelectorAll('.nav-dropdown.open');
+        openDropdowns.forEach(function(dd) { dd.classList.remove('open'); });
+      }
+    });
+    
+    console.log('[Navbar] Dropdown handlers initialized for ' + dropdownToggles.length + ' dropdowns');
+    
+    // Phone button functionality (phoneBtn already declared at top of function)
+    if (phoneBtn) {
+      phoneBtn.addEventListener('click', function() {
+        // Get phone number from placeholder in page or use default
+        const phoneLinks = document.querySelectorAll('a[href^="tel:"]');
+        const phoneNumber = phoneLinks.length > 0 
+          ? phoneLinks[0].getAttribute('href').replace('tel:', '')
+          : '[business_phone]';
+        
+        window.location.href = 'tel:' + phoneNumber;
+        console.log('[Navbar] Phone button clicked');
+      });
+    }
+    
+    console.log('[Navbar] Mobile menu initialized successfully');
+    
+    // === WHATSAPP BUTTON VISIBILITY FIX ===
+    // Ensure WhatsApp floating button is hidden on desktop and visible on mobile
+    // IMPORTANT: Only target the floating button by its class, NOT generic wa.me links
+    const handleWhatsAppVisibility = function() {
+      const whatsappBtn = document.querySelector('.whatsapp-float');
+      if (whatsappBtn) {
+        const isDesktop = window.innerWidth >= 769;
+        if (isDesktop) {
+          whatsappBtn.style.setProperty('display', 'none', 'important');
+          whatsappBtn.style.setProperty('visibility', 'hidden', 'important');
+          whatsappBtn.style.setProperty('opacity', '0', 'important');
+          whatsappBtn.style.setProperty('pointer-events', 'none', 'important');
+          console.log('[WhatsApp] Button hidden on desktop');
+        } else {
+          whatsappBtn.style.removeProperty('display');
+          whatsappBtn.style.removeProperty('visibility');
+          whatsappBtn.style.removeProperty('opacity');
+          whatsappBtn.style.removeProperty('pointer-events');
+          console.log('[WhatsApp] Button visible on mobile');
+        }
+      }
+    };
+    
+    // Run on load
+    handleWhatsAppVisibility();
+    
+    // Run on resize with debouncing
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(handleWhatsAppVisibility, 100);
+    });
+  });
+})();
+
+</script>
+  
+  <main>
+    <section class="platforms-cross-play-intro-section" data-layout-spec="Platforms &amp; Cross-Play-intro">
+  <div class="pcpi-bg-layer" aria-hidden="true">
+    <div class="pcpi-glow pcpi-glow--pink"></div>
+    <div class="pcpi-glow pcpi-glow--cyan"></div>
+    <div class="pcpi-stars"></div>
+  </div>
+
+  <div class="pcpi-container">
+    <div class="pcpi-text-block">
+      <div class="pcpi-eyebrow">
+        <span class="pcpi-eyebrow-dot"></span>
+        <span>Cross-Platform · Cross-Play · One Island</span>
+        <span class="pcpi-eyebrow-dot"></span>
+      </div>
+      <h1 class="pcpi-heading">Hello Kitty Island Adventure — Everywhere You Play</h1>
+      <p class="pcpi-body">Whether you're exploring on Xbox, diving in through Apple Arcade, adventuring on Android, or discovering the island on your Samsung Galaxy device, <strong>Hello Kitty Island Adventure</strong> meets every player right where they are. Our full cross-platform vision brings Xbox console audiences, Apple Arcade subscribers, Android mobile users, and Samsung device owners into one shared social adventure — with cross-play functionality so no friend ever gets left behind on the island.</p>
+      <div class="pcpi-platform-pills">
+        <span class="pcpi-pill"><i class="fa-brands fa-xbox" aria-hidden="true"></i> Xbox</span>
+        <span class="pcpi-pill"><i class="fa-brands fa-apple" aria-hidden="true"></i> Apple Arcade</span>
+        <span class="pcpi-pill"><i class="fa-brands fa-android" aria-hidden="true"></i> Android</span>
+        <span class="pcpi-pill pcpi-pill--samsung"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i> Samsung</span>
+      </div>
+    </div>
+
+    <div class="pcpi-image-wrapper">
+      <div class="pcpi-image-glow-ring" aria-hidden="true"></div>
+      <div class="pcpi-image-frame">
+        <img data-placeholder="platforms-cross-play-intro-image-1" data-context="A cinematic panoramic lineup of multiple gaming devices — Xbox controller, iPad/iPhone showing Apple Arcade, Android phone, and Samsung Galaxy tablet — all displaying Hello Kitty Island Adventure gameplay on their screens. The devices are arranged in a sweeping arc on a deep dark indigo background with glowing cyan and pink neon light reflections beneath each device. The Hello Kitty Island Adventure game screen shows a lush colorful tropical island at dusk with Hello Kitty characters. The composition is wide, premium, and photorealistic with a soft glow halo effect behind the device lineup." width="1100" height="550" src="/assets/site-platforms-cross-play-intro-image-1.webp" alt="Hello Kitty Island Adventure displayed across Xbox, Apple Arcade, Android, and Samsung devices in a panoramic lineup">
+      </div>
+      <div class="pcpi-image-caption">
+        <span class="pcpi-caption-dot" aria-hidden="true"></span>
+        <small>Available across all major platforms with full cross-play support</small>
+        <span class="pcpi-caption-dot" aria-hidden="true"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pcpi-divider-wrapper">
+    <svg data-no-icon-edit="true" aria-hidden="true" viewBox="0 0 1440 64" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,64 L0,32 Q180,8 360,28 T720,18 Q900,8 1080,26 T1440,20 L1440,64 Z" fill="#0d0826"></path>
+    </svg>
+  </div>
+</section>
+
+<section class="platforms-cross-play-capabilities-section" data-layout-spec="Platforms &amp; Cross-Play-capabilities">
+  <div class="pcc-container">
+    <div class="pcc-header">
+      <span class="pcc-label">Supported Play Environments</span>
+      <h2 class="pcc-title">Play Hello Kitty Island Adventure<br>Everywhere You Are</h2>
+      <p class="pcc-subtitle">One island, every platform. Hello Kitty Island Adventure is built for cross-play across Xbox, Apple Arcade, Android, and Samsung Galaxy — so no matter where you game, your friends are always just a hop away.</p>
+    </div>
+
+    <div class="pcc-grid">
+
+      <!-- Xbox Card -->
+      <article class="pcc-card">
+        <div class="pcc-card-image-wrap">
+          <img data-placeholder="platforms-cross-play-capabilities-image-1" data-context="Hello Kitty Island Adventure game running on a modern Xbox Series X console setup in a cozy living room, with the TV displaying a vibrant tropical island scene with Hello Kitty and Sanrio characters, neon pink and cyan glow accents, cinematic dark mood lighting" width="560" height="320" src="/assets/site-platforms-cross-play-capabilities-image-1.webp" alt="Hello Kitty Island Adventure on Xbox console">
+          <div class="pcc-platform-badge xbox-badge">
+            <svg data-element-type="icon" data-icon-type="svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M4.102 21.033C6.211 22.881 8.977 24 12 24c3.026 0 5.789-1.119 7.902-2.967 1.877-1.637-4.912-8.979-7.902-11.033-2.988 2.054-9.777 9.396-7.898 11.033zm11.16-14.406c2.5 2.961 7.484 10.313 6.076 12.912C23.051 17.847 24 15.035 24 12c0-3.54-1.523-6.729-3.951-8.938-1.105-.986-5.646 2.725-4.787 3.565zM3.951 3.062C1.523 5.271 0 8.46 0 12c0 3.033.947 5.845 2.661 8.539-1.41-2.599 3.574-9.951 6.075-12.912.861-.84-3.68-4.551-4.785-3.565zM12 0C8.424 0 5.211 1.473 2.87 3.838 1.807 4.918 7.916 12.357 12 12.357c4.086 0 10.195-7.439 9.129-8.519C18.789 1.473 15.576 0 12 0z"></path></svg>
+            Xbox
+          </div>
+        </div>
+        <div class="pcc-card-body">
+          <h3 class="pcc-card-title">Xbox Consoles</h3>
+          <p class="pcc-card-desc">Bring the island to your living room on Xbox Series X|S and Xbox One. Enjoy Hello Kitty Island Adventure on the big screen with full controller support, Xbox achievements, and seamless cross-play so your console crew can join friends gaming anywhere else.</p>
+        </div>
+      </article>
+
+      <!-- Apple Arcade Card -->
+      <article class="pcc-card">
+        <div class="pcc-card-image-wrap">
+          <img data-placeholder="platforms-cross-play-capabilities-image-2" data-context="Hello Kitty Island Adventure game displayed on an iPhone and iPad side by side, showing the colorful tropical island with Sanrio characters, Apple Arcade branding, soft neon pink and lavender glow, premium dark background, cute and cinematic game UI" width="560" height="320" src="/assets/site-platforms-cross-play-capabilities-image-2.webp" alt="Hello Kitty Island Adventure on Apple Arcade">
+          <div class="pcc-platform-badge apple-badge">
+            <svg data-element-type="icon" data-icon-type="svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"></path></svg>
+            Apple Arcade
+          </div>
+        </div>
+        <div class="pcc-card-body">
+          <h3 class="pcc-card-title">Apple Arcade</h3>
+          <p class="pcc-card-desc">Available through Apple Arcade on iPhone, iPad, Mac, and Apple TV, Hello Kitty Island Adventure fits perfectly into the Apple ecosystem. One subscription unlocks the full experience with no ads, no in-app purchases, and instant handoff between your Apple devices.</p>
+        </div>
+      </article>
+
+      <!-- Android Card -->
+      <article class="pcc-card">
+        <div class="pcc-card-image-wrap">
+          <img data-placeholder="platforms-cross-play-capabilities-image-3" data-context="Hello Kitty Island Adventure running on an Android smartphone, vibrant tropical island game screen with Hello Kitty and friends visible, Google Play badge, neon cyan and pink glow, dark cinematic background, mobile gaming lifestyle setting" width="560" height="320" src="/assets/site-platforms-cross-play-capabilities-image-3.webp" alt="Hello Kitty Island Adventure on Android devices">
+          <div class="pcc-platform-badge android-badge">
+            <svg data-element-type="icon" data-icon-type="svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M17.523 15.341a.826.826 0 0 1-.826.826.826.826 0 0 1-.826-.826.826.826 0 0 1 .826-.826.826.826 0 0 1 .826.826m-9.394 0a.826.826 0 0 1-.826.826.826.826 0 0 1-.826-.826.826.826 0 0 1 .826-.826.826.826 0 0 1 .826.826M17.69 10.5l1.679-2.908a.35.35 0 0 0-.128-.477.35.35 0 0 0-.477.128l-1.7 2.944A10.456 10.456 0 0 0 12 9.296c-1.536 0-2.99.328-4.295.891L6.006 7.243a.35.35 0 0 0-.477-.128.35.35 0 0 0-.128.477L7.08 10.5C4.734 11.788 3.17 14.18 3.17 16.94h17.66c0-2.76-1.564-5.152-3.14-6.44"></path></svg>
+            Android
+          </div>
+        </div>
+        <div class="pcc-card-body">
+          <h3 class="pcc-card-title">Android Devices</h3>
+          <p class="pcc-card-desc">Reaching the broadest mobile audience on the planet, Hello Kitty Island Adventure is available across Android phones and tablets via Google Play. Cross-play means Android players connect directly with Xbox and Apple friends — the island has no walls.</p>
+        </div>
+      </article>
+
+      <!-- Samsung Card -->
+      <article class="pcc-card">
+        <div class="pcc-card-image-wrap">
+          <img data-placeholder="platforms-cross-play-capabilities-image-4" data-context="Hello Kitty Island Adventure displayed on a Samsung Galaxy smartphone and Galaxy Tab, Samsung Galaxy Store app icon visible, colorful Hello Kitty island scene on screen, neon yellow and pink accent glow, cinematic dark premium background, Samsung gaming ecosystem aesthetic" width="560" height="320" src="/assets/site-platforms-cross-play-capabilities-image-4.webp" alt="Hello Kitty Island Adventure on Samsung Galaxy devices">
+          <div class="pcc-platform-badge samsung-badge">
+            <i class="fa-brands fa-samsung" aria-hidden="true"></i>
+            Samsung
+          </div>
+        </div>
+        <div class="pcc-card-body">
+          <h3 class="pcc-card-title">Samsung Galaxy Store</h3>
+          <p class="pcc-card-desc">Galaxy users can discover and download Hello Kitty Island Adventure directly through Samsung Apps and the Galaxy Store, fully optimized for Samsung phones and tablets. Enjoy enhanced performance on Galaxy devices and connect with players across every other supported platform.</p>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="pcc-crossplay-banner">
+      <div class="pcc-crossplay-icon">
+        <svg data-element-type="icon" data-icon-type="svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+      </div>
+      <div class="pcc-crossplay-text">
+        <strong>Full Cross-Play Enabled</strong>
+        <span>Xbox, Apple Arcade, Android &amp; Samsung players share the same island — together.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="platforms-cross-play-integration-section" data-layout-spec="Platforms &amp; Cross-Play-integration">
+  <div class="pcp-container">
+
+    <!-- LEFT: Content Stack -->
+    <div class="pcp-content">
+      <div class="pcp-eyebrow">
+        <span class="pcp-badge"><i class="fa-solid fa-link"></i> Cross-Play Enabled</span>
+      </div>
+      <h2 class="pcp-heading">One Island, Every Platform — Always Connected</h2>
+      <p class="pcp-lead">Hello Kitty Island Adventure brings players together no matter which device they call home. Whether you're on Xbox, Apple Arcade, Android, or a Samsung Galaxy device, your identity, progress, and friendships follow you everywhere. Cross-play means your island never sleeps — and neither does your community.</p>
+
+      <div class="pcp-features">
+        <div class="pcp-feature card-bordered">
+          <div class="pcp-feature-icon">
+            <svg data-element-type="icon" data-icon-type="svg" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          </div>
+          <div class="pcp-feature-body">
+            <h3>Unified Community</h3>
+            <p>Every friend request, every shared moment, every island visit — available across all supported systems. Your social space has no borders.</p>
+          </div>
+        </div>
+
+        <div class="pcp-feature card-bordered">
+          <div class="pcp-feature-icon">
+            <svg data-element-type="icon" data-icon-type="svg" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+          </div>
+          <div class="pcp-feature-body">
+            <h3>Device-Flexible Sessions</h3>
+            <p>Start a session on your Samsung Galaxy, continue on Xbox, pick it back up on iPhone — your island progress syncs seamlessly so you never miss a beat.</p>
+          </div>
+        </div>
+
+        <div class="pcp-feature card-bordered">
+          <div class="pcp-feature-icon">
+            <svg data-element-type="icon" data-icon-type="svg" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+          </div>
+          <div class="pcp-feature-body">
+            <h3>Smoother Audience Growth</h3>
+            <p>A bigger, more connected player base means richer islands, more active events, and a thriving Hello Kitty Island Adventure community that grows with every new platform launch.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Connection Diagram -->
+    <div class="pcp-diagram-wrap">
+      <div class="pcp-diagram">
+
+        <!-- Glow blobs -->
+        <div class="pcp-glow pcp-glow-pink" aria-hidden="true"></div>
+        <div class="pcp-glow pcp-glow-cyan" aria-hidden="true"></div>
+
+        <!-- SVG Lines -->
+        <svg class="pcp-lines" data-no-icon-edit="true" aria-hidden="true" viewBox="0 0 340 340" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="lineGradPink" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FF4FA3" stop-opacity="0.9"></stop>
+              <stop offset="100%" stop-color="#FF4FA3" stop-opacity="0.2"></stop>
+            </linearGradient>
+            <linearGradient id="lineGradCyan" x1="100%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#22D3EE" stop-opacity="0.9"></stop>
+              <stop offset="100%" stop-color="#22D3EE" stop-opacity="0.2"></stop>
+            </linearGradient>
+            <linearGradient id="lineGradYellow" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#FFD166" stop-opacity="0.9"></stop>
+              <stop offset="100%" stop-color="#FFD166" stop-opacity="0.2"></stop>
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2.5" result="coloredBlur"></feGaussianBlur>
+              <feMerge><feMergeNode in="coloredBlur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
+            </filter>
+          </defs>
+          <!-- Lines from center (170,170) to each node -->
+          <!-- Xbox: top-left ~(68, 68) -->
+          <line x1="170" y1="170" x2="82" y2="82" stroke="url(#lineGradPink)" stroke-width="2" filter="url(#glow)" stroke-dasharray="4 3"></line>
+          <!-- Apple: top-right ~(272, 68) -->
+          <line x1="170" y1="170" x2="258" y2="82" stroke="url(#lineGradCyan)" stroke-width="2" filter="url(#glow)" stroke-dasharray="4 3"></line>
+          <!-- Android: bottom-left ~(68, 272) -->
+          <line x1="170" y1="170" x2="82" y2="258" stroke="url(#lineGradYellow)" stroke-width="2" filter="url(#glow)" stroke-dasharray="4 3"></line>
+          <!-- Samsung: bottom-right ~(272, 272) -->
+          <line x1="170" y1="170" x2="258" y2="258" stroke="url(#lineGradCyan)" stroke-width="2" filter="url(#glow)" stroke-dasharray="4 3"></line>
+        </svg>
+
+        <!-- Platform Nodes -->
+        <div class="pcp-node pcp-node-tl">
+          <div class="pcp-node-circle pcp-node-xbox">
+            <i class="fa-brands fa-xbox"></i>
+          </div>
+          <span class="pcp-node-label">Xbox</span>
+        </div>
+
+        <div class="pcp-node pcp-node-tr">
+          <div class="pcp-node-circle pcp-node-apple">
+            <i class="fa-brands fa-apple"></i>
+          </div>
+          <span class="pcp-node-label">Apple Arcade</span>
+        </div>
+
+        <div class="pcp-node pcp-node-bl">
+          <div class="pcp-node-circle pcp-node-android">
+            <i class="fa-brands fa-android"></i>
+          </div>
+          <span class="pcp-node-label">Android</span>
+        </div>
+
+        <div class="pcp-node pcp-node-br">
+          <div class="pcp-node-circle pcp-node-samsung">
+            <i class="fa-solid fa-mobile-screen"></i>
+          </div>
+          <span class="pcp-node-label">Samsung Galaxy</span>
+        </div>
+
+        <!-- Central Island Emblem -->
+        <div class="pcp-center-emblem">
+          <div class="pcp-center-ring pcp-center-ring-outer" aria-hidden="true"></div>
+          <div class="pcp-center-ring pcp-center-ring-inner" aria-hidden="true"></div>
+          <div class="pcp-center-core">
+            <img data-placeholder="platforms-cross-play-integration-image-1" data-context="Hello Kitty Island Adventure game logo or Hello Kitty character icon centered as a glowing island emblem, surrounded by soft neon pink and cyan aura on a deep dark indigo background, cute Sanrio art style, premium game branding feel" width="80" height="80" src="/assets/site-platforms-cross-play-integration-image-1.webp" alt="Hello Kitty Island Adventure cross-play central emblem">
+          </div>
+          <span class="pcp-center-label">Island Hub</span>
+        </div>
+
+      </div>
+
+      <!-- Diagram caption -->
+      <p class="pcp-diagram-caption">All platforms connect to a single shared island — real-time, cross-play, always on.</p>
+    </div>
+
+  </div>
+</section>
+
+<section class="platforms-cross-play-process-section" data-layout-spec="Platforms &amp; Cross-Play-process">
+  <div class="pcpp-container">
+
+    <!-- Section Header -->
+    <div class="pcpp-header">
+      <span class="pcpp-eyebrow">Seamless Multi-Device Play</span>
+      <h2 class="pcpp-title">Play Anywhere, Together — <span class="pcpp-title-highlight">Simple as That</span></h2>
+      <p class="pcpp-subtitle">Moving between your Xbox, iPhone, Android, or Samsung device should feel as breezy as a day on the island. Hello Kitty Island Adventure is designed for the whole family — no complicated setup, just pure cross-platform fun.</p>
+    </div>
+
+    <!-- Steps + Image Layout -->
+    <div class="pcpp-layout">
+
+      <!-- Steps Column -->
+      <div class="pcpp-steps">
+
+        <!-- Step 1 -->
+        <article class="pcpp-step-card">
+          <div class="pcpp-step-number-wrap">
+            <span class="pcpp-step-number">01</span>
+          </div>
+          <div class="pcpp-step-content">
+            <h3 class="pcpp-step-title">Choose Your Platform</h3>
+            <p class="pcpp-step-desc">Pick up Hello Kitty Island Adventure on any supported platform — Xbox consoles, Apple Arcade, Android via Google Play, or Samsung Galaxy Store. One game, every screen. Whether you're on the couch with a controller or exploring on the go, your island is always waiting.</p>
+            <div class="pcpp-step-platforms">
+              <span class="pcpp-platform-tag"><i class="fa-brands fa-xbox"></i> Xbox</span>
+              <span class="pcpp-platform-tag"><i class="fa-brands fa-apple"></i> Apple Arcade</span>
+              <span class="pcpp-platform-tag"><i class="fa-brands fa-android"></i> Android</span>
+              <span class="pcpp-platform-tag"><i class="fa-brands fa-samsung"></i> Samsung</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Connector -->
+        <div class="pcpp-connector" aria-hidden="true">
+          <div class="pcpp-connector-line"></div>
+          <div class="pcpp-connector-dot"></div>
+        </div>
+
+        <!-- Step 2 -->
+        <article class="pcpp-step-card">
+          <div class="pcpp-step-number-wrap">
+            <span class="pcpp-step-number">02</span>
+          </div>
+          <div class="pcpp-step-content">
+            <h3 class="pcpp-step-title">Connect &amp; Continue Your Account</h3>
+            <p class="pcpp-step-desc">Link your game account once and your progress follows you everywhere. Pair your phone to your console, switch from your Samsung Galaxy to an iPad — your island, your decorations, and your friendships carry over automatically. Family-friendly phone pairing means even younger players can jump in without a fuss.</p>
+            <div class="pcpp-step-badge">
+              <i class="fa-solid fa-rotate"></i>
+              <span>Progress syncs across all devices</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Connector -->
+        <div class="pcpp-connector" aria-hidden="true">
+          <div class="pcpp-connector-line"></div>
+          <div class="pcpp-connector-dot"></div>
+        </div>
+
+        <!-- Step 3 -->
+        <article class="pcpp-step-card pcpp-step-card--accent">
+          <div class="pcpp-step-number-wrap">
+            <span class="pcpp-step-number">03</span>
+          </div>
+          <div class="pcpp-step-content">
+            <h3 class="pcpp-step-title">Join Friends with Cross-Play</h3>
+            <p class="pcpp-step-desc">Cross-play means your Xbox friends can visit your island even if you're playing on Android — and vice versa. Send invites, explore together, and share island moments with everyone you love, no matter which device they're holding. Hello Kitty Island Adventure is better when you bring your whole crew.</p>
+            <div class="pcpp-step-badge pcpp-step-badge--pink">
+              <i class="fa-solid fa-users"></i>
+              <span>Play together across every platform</span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- Image Column -->
+      <aside class="pcpp-image-col">
+        <div class="pcpp-image-wrapper">
+          <div class="pcpp-image-glow" aria-hidden="true"></div>
+          <img data-placeholder="platforms-cross-play-process-image-1" data-context="A warm, charming scene showing a Hello Kitty Island Adventure game interface displayed across multiple devices simultaneously — a Samsung Galaxy phone, an iPhone, an Xbox controller, and a tablet — all showing the same colorful island game screen with Hello Kitty characters. The devices are arranged in a friendly cluster with soft glowing light connecting them, suggesting seamless cross-play and account pairing. The background is a soft pastel gradient with a tropical island feel. Cute, family-friendly, Sanrio aesthetic." width="520" height="640" src="/assets/site-platforms-cross-play-process-image-1.webp" alt="Hello Kitty Island Adventure shown across multiple devices with cross-play and phone pairing">
+          <div class="pcpp-image-tag">
+            <i class="fa-solid fa-link"></i>
+            <span>Phone Pairing &amp; Cross-Play Ready</span>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- Bottom CTA note -->
+    <div class="pcpp-footnote">
+      <i class="fa-solid fa-circle-check"></i>
+      <p>No complicated setup required — Hello Kitty Island Adventure is designed to be simple, joyful, and family-friendly on every platform.</p>
+    </div>
+
+  </div>
+</section>
+
+<section class="platforms-cross-play-faq-section" data-layout-spec="Platforms &amp; Cross-Play-faq">
+  <div class="faq-container">
+    <div class="faq-header">
+      <span class="faq-eyebrow">Got Questions?</span>
+      <h2 class="faq-title">Frequently Asked Questions</h2>
+      <p class="faq-subtitle">Everything you need to know about Hello Kitty Island Adventure across all platforms and cross-play features.</p>
+    </div>
+
+    <div class="faq-list">
+
+      <article class="faq-item">
+        <div class="faq-question-row">
+          <div class="faq-icon" aria-hidden="true">
+            <svg data-element-type="icon" data-icon-type="svg" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"></circle>
+              <path d="M10 6v4l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <h3 class="faq-question">Which platforms will Hello Kitty Island Adventure be available on?</h3>
+        </div>
+        <div class="faq-answer-row">
+          <div class="faq-answer-spacer" aria-hidden="true"></div>
+          <p class="faq-answer">Hello Kitty Island Adventure is expanding to all major platforms so no fan gets left behind. You'll be able to play on <strong>Xbox consoles</strong>, <strong>Apple Arcade</strong> on iPhone, iPad, and Mac, <strong>Android devices</strong> via Google Play, and <strong>Samsung Galaxy phones and tablets</strong> through the Galaxy Store and Samsung Apps. Whether you're a console player or a mobile gamer, the island is open for everyone.</p>
+        </div>
+      </article>
+
+      <div class="faq-divider" aria-hidden="true"></div>
+
+      <article class="faq-item">
+        <div class="faq-question-row">
+          <div class="faq-icon" aria-hidden="true">
+            <svg data-element-type="icon" data-icon-type="svg" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 10a3 3 0 1 0 6 0 3 3 0 0 0-6 0z" stroke="currentColor" stroke-width="1.5"></path>
+              <path d="M2 10c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+              <path d="M14 14l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <h3 class="faq-question">What does cross-play actually mean for playing with friends?</h3>
+        </div>
+        <div class="faq-answer-row">
+          <div class="faq-answer-spacer" aria-hidden="true"></div>
+          <p class="faq-answer">Cross-play means your friends don't need to own the same device or console as you to visit your island together. A player on Xbox can hang out, craft, and explore alongside a friend on an Android phone or Samsung Galaxy tablet — all in the same shared world. You'll connect through a single account so your progress, island, and friendships travel with you no matter which screen you pick up.</p>
+        </div>
+      </article>
+
+      <div class="faq-divider" aria-hidden="true"></div>
+
+      <article class="faq-item">
+        <div class="faq-question-row">
+          <div class="faq-icon" aria-hidden="true">
+            <svg data-element-type="icon" data-icon-type="svg" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="3" width="14" height="14" rx="3" stroke="currentColor" stroke-width="1.5"></rect>
+              <path d="M7 10h6M10 7v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <h3 class="faq-question">Are Samsung phones and Galaxy devices fully supported?</h3>
+        </div>
+        <div class="faq-answer-row">
+          <div class="faq-answer-spacer" aria-hidden="true"></div>
+          <p class="faq-answer">Yes! Samsung Galaxy phones and tablets are a core part of our cross-platform rollout. Hello Kitty Island Adventure will be available through the <strong>Galaxy Store</strong> and <strong>Samsung Apps</strong>, optimized to take full advantage of Samsung's display quality and performance. Samsung users will have the same full game experience — including cross-play with Xbox, Apple Arcade, and Android players — right from their Galaxy device.</p>
+        </div>
+      </article>
+
+      <div class="faq-divider" aria-hidden="true"></div>
+
+      <article class="faq-item">
+        <div class="faq-question-row">
+          <div class="faq-icon" aria-hidden="true">
+            <svg data-element-type="icon" data-icon-type="svg" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 2C5.582 2 2 5.582 2 10s3.582 8 8 8 8-3.582 8-8-3.582-8-8-8z" stroke="currentColor" stroke-width="1.5"></path>
+              <path d="M13 8c0-1.657-1.343-3-3-3S7 6.343 7 8c0 1.306.835 2.418 2 2.83V14h2v-3.17A3.001 3.001 0 0 0 13 8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path>
+            </svg>
+          </div>
+          <h3 class="faq-question">How does Apple Arcade fit into the cross-play plan?</h3>
+        </div>
+        <div class="faq-answer-row">
+          <div class="faq-answer-spacer" aria-hidden="true"></div>
+          <p class="faq-answer">Apple Arcade players are fully included in the cross-play ecosystem. If you subscribe to Apple Arcade on your iPhone, iPad, or Mac, you'll access the complete Hello Kitty Island Adventure experience and be able to play alongside friends on Xbox, Android, and Samsung devices. Apple Arcade's premium, ad-free environment pairs beautifully with the game's cozy island atmosphere — and your island progress syncs seamlessly across your Apple devices through iCloud.</p>
+        </div>
+      </article>
+
+      <div class="faq-divider" aria-hidden="true"></div>
+
+      <article class="faq-item">
+        <div class="faq-question-row">
+          <div class="faq-icon" aria-hidden="true">
+            <svg data-element-type="icon" data-icon-type="svg" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 2v4M10 14v4M4.93 4.93l2.83 2.83M12.24 12.24l2.83 2.83M2 10h4M14 10h4M4.93 15.07l2.83-2.83M12.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <h3 class="faq-question">Will my account and island progress carry over between platforms?</h3>
+        </div>
+        <div class="faq-answer-row">
+          <div class="faq-answer-spacer" aria-hidden="true"></div>
+          <p class="faq-answer">Account continuity is a cornerstone of our cross-platform vision. Your island, friendships, collected items, and progress are tied to your Hello Kitty Island Adventure account — not to a single device. Switch from your Xbox to your Samsung Galaxy or Apple Arcade device and pick up exactly where you left off. We're designing the experience so your island truly belongs to <em>you</em>, wherever you play.</p>
+        </div>
+      </article>
+
+      <div class="faq-divider" aria-hidden="true"></div>
+
+      <article class="faq-item">
+        <div class="faq-question-row">
+          <div class="faq-icon" aria-hidden="true">
+            <svg data-element-type="icon" data-icon-type="svg" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16z" stroke="currentColor" stroke-width="1.5"></path>
+              <path d="M10 7v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </div>
+          <h3 class="faq-question">When will the cross-platform rollout happen?</h3>
+        </div>
+        <div class="faq-answer-row">
+          <div class="faq-answer-spacer" aria-hidden="true"></div>
+          <p class="faq-answer">We're actively working on bringing Hello Kitty Island Adventure to Xbox, Android, and Samsung devices alongside the existing Apple Arcade version. Rollout timelines and platform-specific launch details are being finalized. We'll announce dates and availability as soon as they're confirmed — follow our official channels to stay up to date and be the first to know when your platform goes live.</p>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="faq-cta-block">
+      <div class="faq-cta-inner">
+        <p class="faq-cta-text">Still have questions about platform availability, cross-play setup, or the Samsung and Xbox rollout? Our team is happy to help with all the details.</p>
+        <a href="/contact" class="btn-primary faq-cta-btn">Contact Us for Rollout Details</a>
+      </div>
+    </div>
+  </div>
+</section>
+  </main>
+  
+  <footer class="site-footer"><div class="footer-glow footer-glow--pink"></div><div class="footer-glow footer-glow--cyan"></div><div class="footer-container"><div class="footer-top"><div class="footer-col footer-col--brand"><img src="/assets/business-logo.webp" alt="Hello Kitty Island Adventure" class="logo"><p class="footer-tagline">Your cozy island awaits. Play across every platform and adventure together, wherever you are.</p><div class="footer-social"><a href="[facebook_handle]" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="[instagram_handle]" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="[whatsapp_handle]" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a></div></div><div class="footer-col"><h3 class="footer-heading"><span class="footer-heading-accent"></span>Explore</h3><ul class="footer-links"><li><a href="/platforms-cross-play"><i class="fas fa-gamepad footer-link-icon"></i>Platforms &amp; Cross-Play</a></li><li><a href="/about"><i class="fas fa-island-tropical footer-link-icon"></i>About the Adventure</a></li><li><a href="/contact"><i class="fas fa-paper-plane footer-link-icon"></i>Contact</a></li></ul></div><div class="footer-col"><h3 class="footer-heading"><span class="footer-heading-accent"></span>Get in Touch</h3><ul class="footer-contact"><li><span class="contact-icon"><i class="fas fa-envelope"></i></span><span class="contact-text"><a href="mailto:[business_email]">[business_email]</a></span></li><li><span class="contact-icon"><i class="fas fa-phone"></i></span><span class="contact-text"><a href="tel:[business_phone]">[business_phone]</a></span></li><li><a href="/"><span class="contact-icon"><i class="fas fa-map-marker-alt"></i></span><span class="contact-text">[business_address]</span></a></li></ul></div><div class="footer-col footer-col--platforms"><h3 class="footer-heading"><span class="footer-heading-accent"></span>Available On</h3><div class="footer-platforms"><span class="platform-badge"><i class="fab fa-xbox"></i> Xbox</span><span class="platform-badge"><i class="fab fa-apple"></i> Apple Arcade</span><span class="platform-badge"><i class="fab fa-android"></i> Android</span><span class="platform-badge"><i class="fas fa-mobile-alt"></i> Samsung</span></div></div></div><div class="footer-divider"></div><div class="footer-bottom"><p class="footer-copyright">© 2026 Hello Kitty Island Adventure. All rights reserved.</p><div class="footer-legal"><a href="/privacy">Privacy Policy</a><a href="/terms">Terms &amp; Conditions</a><span class="separator">|</span>
+            <a href="/return-policy" aria-label="Return Policy">
+              Return Policy
+            </a><a href="/accessibility">Accessibility</a><a href="https://zappy5.com" target="_blank" class="zappy-attribution">Generated by Zappy</a></div></div></div></footer>
+  
+  <a href="https://wa.me/[whatsapp_handle]" class="whatsapp-float" aria-label="WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+  
+  <div data-integration="accessibility:toolbar"></div>
+
+    <script src="/script.js"></script>
+
+    <script id="zappy-mobile-submenu-script">
+    (function() {
+      function initMobileSubmenuToggles() {
+        if (window.innerWidth > 768) {
+          document.querySelectorAll('.mobile-submenu-toggle').forEach(function(btn) { btn.remove(); });
+          document.querySelectorAll('.sub-menu.mobile-expanded').forEach(function(menu) { menu.classList.remove('mobile-expanded'); });
+          return;
+        }
+        var items = document.querySelectorAll('.nav-menu li:has(.sub-menu), nav li:has(.sub-menu), .navbar li:has(.sub-menu), #navMenu li:has(.sub-menu)');
+        items.forEach(function(li) {
+          if (li.querySelector('.mobile-submenu-toggle')) return;
+          var submenu = li.querySelector('.sub-menu');
+          var parentLink = li.querySelector(':scope > a');
+          if (!submenu || !parentLink) return;
+          var toggleBtn = document.createElement('button');
+          toggleBtn.className = 'mobile-submenu-toggle';
+          toggleBtn.setAttribute('aria-label', 'Toggle submenu');
+          toggleBtn.setAttribute('type', 'button');
+          parentLink.insertAdjacentElement('afterend', toggleBtn);
+          toggleBtn.addEventListener('click', function(e) {
+            e.preventDefault(); e.stopPropagation();
+            document.querySelectorAll('.sub-menu.mobile-expanded').forEach(function(menu) {
+              if (menu !== submenu) { menu.classList.remove('mobile-expanded'); var t = menu.parentElement.querySelector('.mobile-submenu-toggle'); if(t) t.classList.remove('expanded'); }
+            });
+            submenu.classList.toggle('mobile-expanded');
+            toggleBtn.classList.toggle('expanded');
+          });
+        });
+      }
+      if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initMobileSubmenuToggles); }
+      else { initMobileSubmenuToggles(); }
+      var resizeTimer; window.addEventListener('resize', function() { clearTimeout(resizeTimer); resizeTimer = setTimeout(initMobileSubmenuToggles, 250); });
+      // Re-initialize when mobile menu becomes visible (MutationObserver)
+      var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes') {
+            var target = mutation.target;
+            if (target.classList && (target.classList.contains('active') || target.classList.contains('open'))) {
+              setTimeout(initMobileSubmenuToggles, 100);
+            }
+          }
+        });
+      });
+      setTimeout(function() {
+        document.querySelectorAll('.mobile-menu, .nav-menu, #navMenu, nav').forEach(function(menu) {
+          observer.observe(menu, { attributes: true, attributeFilter: ['class', 'style'] });
+        });
+      }, 500);
+    })();
+    </script>
+
+    <script id="zappy-navbar-scroll-effect">
+    (function(){
+      var nb=document.querySelector('nav.navbar,.navbar:not(.zappy-catalog-menu)');
+      var cm=document.querySelector('.zappy-catalog-menu,#zappy-catalog-menu');
+      if(!nb)return;
+      var fb='rgba(246,243,255,0.85)';
+      var th=60;
+      var rs=getComputedStyle(document.documentElement);
+      var td=rs.getPropertyValue('--text-dark').trim()||'#1a1a1a';
+      var tl=rs.getPropertyValue('--text-light').trim()||'#ffffff';
+      var st=true?td:tl;
+      nb.style.transition='background 0.3s ease,backdrop-filter 0.3s ease,-webkit-backdrop-filter 0.3s ease,box-shadow 0.3s ease';
+      if(cm)cm.style.transition='background 0.3s ease,backdrop-filter 0.3s ease,-webkit-backdrop-filter 0.3s ease';
+      var neSel='a,.navbar-brand,.navbar-brand a,.dropdown-toggle,.mobile-toggle,.phone-header-btn,.mobile-hamburger-btn,.mobile-close-btn,.mobile-submenu-toggle,.nav-link';
+      var skipCls=['cart-link','login-link','nav-search-toggle','search-toggle'];
+      function sTC(c,clr){var els=c.querySelectorAll(neSel);for(var i=0;i<els.length;i++){var sk=false;if(els[i].closest('.sub-menu')||els[i].closest('.dropdown-menu')){sk=true;}for(var j=0;j<skipCls.length;j++){if(els[i].classList.contains(skipCls[j])){sk=true;break;}}if(!sk)els[i].style.setProperty('color',clr,'important');}}
+      function cTC(c){var els=c.querySelectorAll(neSel);for(var i=0;i<els.length;i++){if(els[i].closest('.sub-menu')||els[i].closest('.dropdown-menu'))continue;els[i].style.removeProperty('color');}}
+      function applyScrolled(){
+        nb.classList.add('scrolled');
+        if(window.innerWidth>768){
+          nb.style.setProperty('--frosted-text',st);
+          nb.style.setProperty('background-image','none','important');
+          nb.style.setProperty('background-color',fb,'important');
+          nb.style.backdropFilter='blur(12px)';nb.style.webkitBackdropFilter='blur(12px)';nb.style.boxShadow='0 2px 16px rgba(0,0,0,0.12)';
+          sTC(nb,st);
+        }
+        if(cm){cm.classList.add('scrolled');if(window.innerWidth>768){cm.style.setProperty('background',fb,'important');cm.style.setProperty('backdrop-filter','blur(12px)','important');cm.style.setProperty('-webkit-backdrop-filter','blur(12px)','important');sTC(cm,st);}}
+      }
+      function onS(){
+        if(window._zappyNavNoDarkHero) return;
+        if(window.innerWidth<=768){nb.classList.remove('scrolled');cTC(nb);if(cm){cm.classList.remove('scrolled');cTC(cm);}return;}
+        var y=window.scrollY||window.pageYOffset;
+        if(y>th){
+          nb.classList.add('scrolled');nb.style.setProperty('background-color',fb,'important');nb.style.setProperty('background-image','none','important');
+          nb.style.setProperty('--frosted-text',st);nb.style.backdropFilter='blur(12px)';nb.style.webkitBackdropFilter='blur(12px)';nb.style.boxShadow='0 2px 16px rgba(0,0,0,0.12)';
+          sTC(nb,st);
+          if(cm){cm.classList.add('scrolled');cm.style.setProperty('background',fb,'important');cm.style.setProperty('backdrop-filter','blur(12px)','important');cm.style.setProperty('-webkit-backdrop-filter','blur(12px)','important');sTC(cm,st);}
+        }else{
+          nb.classList.remove('scrolled');nb.style.setProperty('background-color','transparent','important');nb.style.removeProperty('background-image');
+          nb.style.removeProperty('--frosted-text');nb.style.backdropFilter='none';nb.style.webkitBackdropFilter='none';nb.style.boxShadow='none';
+          cTC(nb);
+          if(cm){cm.classList.remove('scrolled');cm.style.setProperty('background','transparent','important');cm.style.setProperty('backdrop-filter','none','important');cm.style.setProperty('-webkit-backdrop-filter','none','important');cTC(cm);}
+        }
+      }
+      function sLum(rv,gv,bv){rv/=255;gv/=255;bv/=255;rv=rv<=0.03928?rv/12.92:Math.pow((rv+0.055)/1.055,2.4);gv=gv<=0.03928?gv/12.92:Math.pow((gv+0.055)/1.055,2.4);bv=bv<=0.03928?bv/12.92:Math.pow((bv+0.055)/1.055,2.4);return 0.2126*rv+0.7152*gv+0.0722*bv;}
+      window.addEventListener('scroll',onS,{passive:true});
+      window.addEventListener('resize',onS,{passive:true});
+      onS();
+      var heroEl=document.querySelector('section[class*="hero"],[data-hero-type],main>section:first-child');
+      var hasDH=false;
+      if(heroEl){var hCs=getComputedStyle(heroEl);var hBI=hCs.backgroundImage;if(hBI&&hBI!=='none'){if(hBI.indexOf('url(')!==-1){var hM2=hCs.backgroundColor.match(/\d+/g);if(hM2&&hM2.length>=3){hasDH=sLum(parseInt(hM2[0]),parseInt(hM2[1]),parseInt(hM2[2]))<0.4;}else{hasDH=true;}}else if(hBI.indexOf('gradient')!==-1){var cM=hBI.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/g);if(cM&&cM.length>0){var tLm=0;for(var ci=0;ci<cM.length;ci++){var pts=cM[ci].match(/\d+/g);tLm+=sLum(parseInt(pts[0]),parseInt(pts[1]),parseInt(pts[2]));}hasDH=(tLm/cM.length)<0.4;}else{hasDH=true;}}else{hasDH=true;}}else{var hM=hCs.backgroundColor.match(/\d+/g);if(hM&&hM.length>=3){hasDH=sLum(parseInt(hM[0]),parseInt(hM[1]),parseInt(hM[2]))<0.4;}}}
+      if(!hasDH){window.removeEventListener('scroll',onS);window.removeEventListener('resize',onS);applyScrolled();window._zappyNavNoDarkHero=true;}
+    })();
+    </script>
+
+    <script id="zappy-mobile-lang-menu-script">
+    (function() {
+      function initMobileLangMenu() {
+        if (window.innerWidth > 768) {
+          var existingMenu = document.querySelector('.mobile-lang-menu');
+          if (existingMenu) existingMenu.remove();
+          return;
+        }
+        if (document.querySelector('.mobile-lang-menu')) return;
+        var switcher = document.querySelector('.lang-switcher');
+        if (!switcher) return;
+        var dropdown = switcher.querySelector('.lang-switcher-dropdown');
+        if (!dropdown) return;
+        var options = dropdown.querySelectorAll('.lang-option');
+        if (options.length === 0) return;
+        var navMenu = document.getElementById('navMenu') || document.querySelector('.nav-menu') || document.querySelector('nav ul');
+        if (!navMenu) return;
+        var currentLang = document.documentElement.lang || 'en';
+        var langConfigs = {
+          he: {name:'עברית',flag:'https://api.iconify.design/circle-flags/il.svg'},
+          en: {name:'English',flag:'https://api.iconify.design/circle-flags/us.svg'},
+          ar: {name:'العربية',flag:'https://api.iconify.design/circle-flags/sa.svg'},
+          fr: {name:'Français',flag:'https://api.iconify.design/circle-flags/fr.svg'},
+          es: {name:'Español',flag:'https://api.iconify.design/circle-flags/es.svg'},
+          de: {name:'Deutsch',flag:'https://api.iconify.design/circle-flags/de.svg'},
+          ru: {name:'Русский',flag:'https://api.iconify.design/circle-flags/ru.svg'},
+          zh: {name:'中文',flag:'https://api.iconify.design/circle-flags/cn.svg'},
+          ja: {name:'日本語',flag:'https://api.iconify.design/circle-flags/jp.svg'},
+          pt: {name:'Português',flag:'https://api.iconify.design/circle-flags/br.svg'},
+          it: {name:'Italiano',flag:'https://api.iconify.design/circle-flags/it.svg'},
+          ko: {name:'한국어',flag:'https://api.iconify.design/circle-flags/kr.svg'}
+        };
+        var container = document.createElement('div');
+        container.className = 'mobile-lang-menu';
+        var currentConfig = langConfigs[currentLang] || {name:currentLang,flag:''};
+        var toggleBtn = document.createElement('button');
+        toggleBtn.className = 'mobile-lang-toggle';
+        toggleBtn.type = 'button';
+        var currentFlagHtml = currentConfig.flag ? '<img src="' + currentConfig.flag + '" width="20" height="20" alt="" style="border-radius:50%;margin-right:8px;margin-left:8px;">' : '';
+        toggleBtn.innerHTML = currentFlagHtml + currentConfig.name;
+        container.appendChild(toggleBtn);
+        var optionsDiv = document.createElement('div');
+        optionsDiv.className = 'mobile-lang-options';
+        var currentLink = document.createElement('a');
+        currentLink.className = 'mobile-lang-option active';
+        currentLink.href = '#';
+        currentLink.innerHTML = currentFlagHtml + currentConfig.name;
+        optionsDiv.appendChild(currentLink);
+        options.forEach(function(opt) {
+          var link = document.createElement('a');
+          link.className = 'mobile-lang-option';
+          link.href = opt.getAttribute('href');
+          link.innerHTML = opt.innerHTML;
+          optionsDiv.appendChild(link);
+        });
+        container.appendChild(optionsDiv);
+        navMenu.appendChild(container);
+        toggleBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleBtn.classList.toggle('expanded');
+          optionsDiv.classList.toggle('expanded');
+        });
+      }
+      if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initMobileLangMenu); }
+      else { initMobileLangMenu(); }
+      window.addEventListener('resize', function() { clearTimeout(window._mlrt); window._mlrt = setTimeout(initMobileLangMenu, 250); });
+    })();
+    </script>
+</body>
+</html>
